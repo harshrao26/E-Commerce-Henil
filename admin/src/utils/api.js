@@ -3,148 +3,123 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 export const postData = async (url, formData) => {
     try {
-        
         const response = await fetch(apiUrl + url, {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-                'Content-Type': 'application/json', // Adjust the content type as needed
-              },
-
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(formData)
         });
 
-
-        if (response.ok) {
-            const data = await response.json();
-            //console.log(data)
-            return data;
-        } else {
-            const errorData = await response.json();
-            return errorData;
-        }
-
+        const data = await response.json();
+        return response.ok ? data : Promise.reject(data);
     } catch (error) {
         console.error('Error:', error);
+        return Promise.reject(error);
     }
-
-}
-
-
+};
 
 export const fetchDataFromApi = async (url) => {
     try {
-        const params={
+        const response = await axios.get(apiUrl + url, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-                'Content-Type': 'application/json', // Adjust the content type as needed
-              },
-        
-        } 
-
-        const { data } = await axios.get(apiUrl + url,params)
-        return data;
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response.data;
     } catch (error) {
         console.log(error);
-        return error;
+        return Promise.reject(error);
     }
-}
+};
+
+export const uploadImage = async (url, updatedData) => {
+    try {
+        const response = await axios.put(apiUrl + url, updatedData, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Upload Error:', error);
+        return Promise.reject(error);
+    }
+};
+
+export const uploadImages = async (url, formData) => {
+    try {
+        const response = await axios.post(apiUrl + url, formData, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response;
+    } catch (error) {
+        console.error('Upload Error:', error);
+        return Promise.reject(error);
+    }
+};
+
+export const editData = async (url, updatedData) => {
+    try {
+        const response = await axios.put(apiUrl + url, updatedData, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+};
+
+export const deleteImages = async (url) => {
+    try {
+        const response = await axios.delete(apiUrl + url, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+};
+
+export const deleteData = async (url) => {
+    try {
+        const response = await axios.delete(apiUrl + url, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+};
+
+export const deleteMultipleData = async (url, data) => {
+    try {
+        const response = await axios.delete(apiUrl + url, {
+            data,
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        return response;
+    } catch (error) {
+        return Promise.reject(error);
+    }
+};
 
 
-export const uploadImage = async (url, updatedData ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'multipart/form-data', // Adjust the content type as needed
-          },
-    
-    } 
-
-    var response;
-    await axios.put(apiUrl + url,updatedData, params).then((res)=>{
-        response=res;
-        
-    })
-    return response;
-   
-}
-
-
-export const uploadImages = async (url, formData ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'multipart/form-data', // Adjust the content type as needed
-          },
-    
-    } 
-
-    var response;
-    await axios.post(apiUrl + url,formData, params).then((res)=>{
-        response=res;
-        
-    })
-    return response;
-   
-}
-
-
-
-export const editData = async (url, updatedData ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'application/json', // Adjust the content type as needed
-          },
-    
-    } 
-
-    var response;
-    await axios.put(apiUrl + url,updatedData, params).then((res)=>{
-        response=res;
-        
-    })
-    return response;
-   
-}
-
-
-
-
-
-export const deleteImages = async (url,image ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'application/json', // Adjust the content type as needed
-          },
-    
-    } 
-    const { res } = await axios.delete(apiUrl + url, params);
-    return res;
-}
-
-
-export const deleteData = async (url ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'application/json', // Adjust the content type as needed
-          },
-    
-    } 
-    const { res } = await axios.delete(apiUrl + url,params)
-    return res;
-}
-
-export const deleteMultipleData = async (url,data ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'application/json', // Adjust the content type as needed
-          },
-    
-    } 
-    const { res } = await axios.delete(apiUrl + url,data,params)
-    return res;
-}

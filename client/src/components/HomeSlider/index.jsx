@@ -7,8 +7,7 @@ import { Navigation, Autoplay } from "swiper/modules";
 import { MyContext } from "../../App";
 
 const HomeSlider = (props) => {
-
-  const context  = useContext(MyContext);
+  const context = useContext(MyContext);
 
   return (
     <div className="homeSlider pb-3 pt-3 lg:pb-5 lg:pt-5 relative z-[99]">
@@ -24,8 +23,8 @@ const HomeSlider = (props) => {
           }}
           className="sliderHome"
         >
-          {
-            props?.data?.length !== 0 && props?.data?.slice()?.reverse()?.map((item, index) => {
+          {props?.data?.length !== 0 &&
+            props?.data?.slice()?.reverse()?.map((item, index) => {
               return (
                 <SwiperSlide key={index}>
                   <div className="item rounded-[10px] overflow-hidden">
@@ -36,10 +35,8 @@ const HomeSlider = (props) => {
                     />
                   </div>
                 </SwiperSlide>
-              )
-            })
-          }
-
+              );
+            })}
         </Swiper>
       </div>
     </div>

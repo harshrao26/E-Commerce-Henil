@@ -9,7 +9,6 @@ import { createContext, useState } from "react";
 import Login from "./Pages/Login";
 import SignUp from "./Pages/SignUp";
 import Products from "./Pages/Products";
-
 import HomeSliderBanners from "./Pages/HomeSliderBanners";
 import CategoryList from "./Pages/Categegory";
 import SubCategoryList from "./Pages/Categegory/subCatList";
@@ -18,7 +17,6 @@ import Orders from "./Pages/Orders";
 import ForgotPassword from "./Pages/ForgotPassword";
 import VerifyAccount from "./Pages/VerifyAccount";
 import ChangePassword from "./Pages/ChangePassword";
-
 import toast, { Toaster } from 'react-hot-toast';
 import { fetchDataFromApi } from "./utils/api";
 import { useEffect } from "react";
@@ -34,6 +32,7 @@ import ManageLogo from "./Pages/ManageLogo";
 import LoadingBar from "react-top-loading-bar";
 
 const MyContext = createContext();
+
 function App() {
   const [isSidebarOpen, setisSidebarOpen] = useState(true);
   const [isLogin, setIsLogin] = useState(false);
@@ -42,15 +41,11 @@ function App() {
   const [catData, setCatData] = useState([]);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [sidebarWidth, setSidebarWidth] = useState(18);
-
   const [progress, setProgress] = useState(0);
-
-
   const [isOpenFullScreenPanel, setIsOpenFullScreenPanel] = useState({
     open: false,
     id: ""
   });
-
 
   useEffect(() => {
     if (windowWidth < 992) {
@@ -60,7 +55,6 @@ function App() {
       setSidebarWidth(18)
     }
   }, [windowWidth])
-
 
   useEffect(() => {
     if (userData?.role !== "ADMIN") {
@@ -77,7 +71,6 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -88,7 +81,6 @@ function App() {
                   } transition-all`}
               >
                 <Sidebar />
-
               </div>
               <div
                 className={`contentRight overflow-hidden py-4 px-5 ${isSidebarOpen === true && windowWidth < 992 && 'opacity-0'}  transition-all`}
@@ -103,7 +95,6 @@ function App() {
     },
     {
       path: "/login",
-      exact: true,
       element: (
         <>
           <Login />
@@ -112,7 +103,6 @@ function App() {
     },
     {
       path: "/sign-up",
-      exact: true,
       element: (
         <>
           <SignUp />
@@ -121,7 +111,6 @@ function App() {
     },
     {
       path: "/forgot-password",
-      exact: true,
       element: (
         <>
           <ForgotPassword />
@@ -130,7 +119,6 @@ function App() {
     },
     {
       path: "/verify-account",
-      exact: true,
       element: (
         <>
           <VerifyAccount />
@@ -139,7 +127,6 @@ function App() {
     },
     {
       path: "/change-password",
-      exact: true,
       element: (
         <>
           <ChangePassword />
@@ -148,7 +135,6 @@ function App() {
     },
     {
       path: "/products",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -173,7 +159,6 @@ function App() {
     },
     {
       path: "/homeSlider/list",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -198,7 +183,6 @@ function App() {
     },
     {
       path: "/category/list",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -223,7 +207,6 @@ function App() {
     },
     {
       path: "/subCategory/list",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -248,7 +231,6 @@ function App() {
     },
     {
       path: "/users",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -273,7 +255,6 @@ function App() {
     },
     {
       path: "/orders",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -298,7 +279,6 @@ function App() {
     },
     {
       path: "/profile",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -323,7 +303,6 @@ function App() {
     },
     {
       path: "/product/:id",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -346,10 +325,8 @@ function App() {
         </>
       ),
     },
-
     {
       path: "/product/addRams",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -374,7 +351,6 @@ function App() {
     },
     {
       path: "/product/addWeight",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -399,7 +375,6 @@ function App() {
     },
     {
       path: "/product/addSize",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -424,7 +399,6 @@ function App() {
     },
     {
       path: "/bannerV1/list",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -449,7 +423,6 @@ function App() {
     },
     {
       path: "/bannerlist2/List",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -474,7 +447,6 @@ function App() {
     },
     {
       path: "/blog/List",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -499,7 +471,6 @@ function App() {
     },
     {
       path: "/logo/manage",
-      exact: true,
       element: (
         <>
           <section className="main">
@@ -533,9 +504,7 @@ function App() {
     }
   }
 
-
   useEffect(() => {
-
     const token = localStorage.getItem('accessToken');
 
     if (token !== undefined && token !== null && token !== "") {
@@ -548,17 +517,12 @@ function App() {
           localStorage.removeItem("refreshToken");
           setIsLogin(false);
           alertBox("error", "Your session is closed please login again")
-
-          //window.location.href = "/login"
         }
       })
-
     } else {
       setIsLogin(false);
     }
-
   }, [isLogin])
-
 
   useEffect(() => {
     getCat();
@@ -572,16 +536,13 @@ function App() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-
   }, [])
-
 
   const getCat = () => {
     fetchDataFromApi("/api/category").then((res) => {
       setCatData(res?.data)
     })
   }
-
 
   const values = {
     isSidebarOpen,

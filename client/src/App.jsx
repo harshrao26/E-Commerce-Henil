@@ -25,7 +25,10 @@ import Address from "./Pages/MyAccount/address";
 import { OrderSuccess } from "./Pages/Orders/success";
 import { OrderFailed } from "./Pages/Orders/failed";
 import SearchPage from "./Pages/Search";
-
+import AffiliateForm from "./Pages/AffiliateForm/AffiliateForm";
+import AffiliatePayment from "./Pages/AffiliatePayment/AffiliatePayment";
+import AffiliateSuccess from "./Pages/AffiliateSuccess/AffiliateSuccess";
+import AffiliateFailed from "./Pages/AffiliateFailed/AffiliateFailed";
 
 const MyContext = createContext();
 
@@ -75,31 +78,21 @@ function App() {
     if (newOpen == false) {
       setAddressMode("add");
     }
-
     setOpenAddressPanel(newOpen);
   };
 
-
-
-
   useEffect(() => {
-
     const token = localStorage.getItem('accessToken');
 
     if (token !== undefined && token !== null && token !== "") {
       setIsLogin(true);
-
       getCartItems();
       getMyListData();
       getUserDetails();
-
     } else {
       setIsLogin(false);
     }
-
-
   }, [isLogin])
-
 
   const getUserDetails = () => {
     fetchDataFromApi(`/api/user/user-details`).then((res) => {
@@ -109,17 +102,11 @@ function App() {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           alertBox("error", "Your session is closed please login again");
-
-
-          //window.location.href = "/login"
-
           setIsLogin(false);
         }
       }
     })
   }
-
-
 
   useEffect(() => {
     fetchDataFromApi("/api/category").then((res) => {
@@ -130,6 +117,11 @@ function App() {
 
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
+      // Close panels if window is resized to desktop size
+      if (window.innerWidth >= 1024) {
+        setOpenSearchPanel(false);
+        setOpenFilter(false);
+      }
     };
 
     window.addEventListener("resize", handleResize);
@@ -137,7 +129,6 @@ function App() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-
   }, []);
 
   const alertBox = (type, msg) => {
@@ -149,10 +140,7 @@ function App() {
     }
   }
 
-
-
   const addToCart = (product, userId, quantity) => {
-
     if (userId === undefined) {
       alertBox("error", "you are not login please login first");
       return false;
@@ -175,24 +163,15 @@ function App() {
       ram: product?.ram
     }
 
-
     postData("/api/cart/add", data).then((res) => {
       if (res?.error === false) {
         alertBox("success", res?.message);
-
         getCartItems();
-
-
       } else {
         alertBox("error", res?.message);
       }
-
     })
-
-
   }
-
-
 
   const getCartItems = () => {
     fetchDataFromApi(`/api/cart/get`).then((res) => {
@@ -201,8 +180,6 @@ function App() {
       }
     })
   }
-
-
 
   const getMyListData = () => {
     fetchDataFromApi("/api/myList").then((res) => {
@@ -257,44 +234,48 @@ function App() {
     <>
       <BrowserRouter>
         <MyContext.Provider value={values}>
+          {/* Header is fixed at top */}
           <Header />
-          <Routes>
-            <Route path={"/"} exact={true} element={<Home />} />
-            <Route
-              path={"/products"}
-              exact={true}
-              element={<ProductListing />}
-            />
-            <Route
-              path={"/product/:id"}
-              exact={true}
-              element={<ProductDetails />}
-            />
-            <Route path={"/login"} exact={true} element={<Login />} />
-            <Route path={"/register"} exact={true} element={<Register />} />
-            <Route path={"/cart"} exact={true} element={<CartPage />} />
-            <Route path={"/verify"} exact={true} element={<Verify />} />
-            <Route path={"/forgot-password"} exact={true} element={<ForgotPassword />} />
-            <Route path={"/checkout"} exact={true} element={<Checkout />} />
-            <Route path={"/my-account"} exact={true} element={<MyAccount />} />
-            <Route path={"/my-list"} exact={true} element={<MyList />} />
-            <Route path={"/my-orders"} exact={true} element={<Orders />} />
-            <Route path={"/order/success"} exact={true} element={<OrderSuccess />} />
-            <Route path={"/order/failed"} exact={true} element={<OrderFailed />} />
-            <Route path={"/address"} exact={true} element={<Address />} />
-            <Route path={"/search"} exact={true} element={<SearchPage />} />
-          </Routes>
+          
+          {/* Main content with proper spacing below fixed header */}
+          <main className="min-h-screen pt-[50px] lg:pt-[100px] bg-white">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/products" element={<ProductListing />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/verify" element={<Verify />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/my-account" element={<MyAccount />} />
+              <Route path="/my-list" element={<MyList />} />
+              <Route path="/my-orders" element={<Orders />} />
+              <Route path="/order/success" element={<OrderSuccess />} />
+              <Route path="/order/failed" element={<OrderFailed />} />
+              <Route path="/address" element={<Address />} />
+              <Route path="/search" element={<SearchPage />} />
+              {/* Affiliate Program Routes */}
+              <Route path="/affiliate-program" element={<AffiliateForm />} />
+              <Route path="/affiliate-payment" element={<AffiliatePayment />} />
+              <Route path="/affiliate-success" element={<AffiliateSuccess />} />
+              <Route path="/affiliate-failure" element={<AffiliateFailed />} />
+            </Routes>
+          </main>
+          
           <Footer />
         </MyContext.Provider>
       </BrowserRouter>
-
-
-
-
-
-      <Toaster />
-
-
+      
+      {/* Toast notifications */}
+      <Toaster 
+        position="top-center"
+        containerStyle={{
+          top: '80px', // Position below header
+          zIndex: 9999
+        }}
+      />
     </>
   );
 }

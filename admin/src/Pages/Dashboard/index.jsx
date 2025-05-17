@@ -182,7 +182,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="w-full py-4 lg:py-1 px-5 border bg-[#f1faff] border-[rgba(0,0,0,0.1)] flex items-center gap-8 mb-5 justify-between rounded-md">
+      <div className="w-full py-4 lg:py-1 px-5 border bg-white border-[rgba(0,0,0,0.1)] flex items-center gap-8 mb-5 justify-between rounded-md">
         <div className="info">
           <h1 className="text-[26px] lg:text-[35px] font-bold leading-8 lg:leading-10 mb-3">
             Welcome,
@@ -456,7 +456,7 @@ const Dashboard = () => {
 
       <div className="card my-4 shadow-md sm:rounded-lg bg-white">
         <div className="flex items-center justify-between px-5 py-5 pb-0">
-          <h2 class="text-[18px] font-[600]">Total Users & Total Sales</h2>
+          <h2 className="text-[18px] font-[600]">Total Users & Total Sales</h2>
         </div>
 
         <div className="flex items-center gap-5 px-5 py-5 pt-1">

@@ -51,15 +51,15 @@ const OrderConfirmationEmail = (username, orders) => {
     </style>
 </head>
 <body>
-    <div class="email-container">
-        <div class="header">Order Confirmation</div>
-        <div class="content">
+    <div className="email-container">
+        <div className="header">Order Confirmation</div>
+        <div className="content">
             <p>Dear <strong>${username}</strong>,</p>
             <p>Thank you for your order! Below are your order details:</p>
 
             
  
-            <table class="order-details">
+            <table className="order-details">
               <tr>
                         <th>Product</th>
                         <th>Quantity</th>
@@ -106,7 +106,7 @@ const OrderConfirmationEmail = (username, orders) => {
             
             <p>If you have any questions, feel free to contact us.</p>
         </div >
-    <div class="footer">
+    <div className="footer">
         &copy; ${new Date().getFullYear()} Your Store. All rights reserved.
     </div>
     </div >

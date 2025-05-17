@@ -587,67 +587,55 @@ export async function verifyForgotPasswordOtp(request, response) {
 //reset password
 export async function resetpassword(request, response) {
     try {
-        const { email, oldPassword, newPassword, confirmPassword } = request.body;
+        const { email, newPassword, confirmPassword } = request.body;
+
         if (!email || !newPassword || !confirmPassword) {
             return response.status(400).json({
                 error: true,
                 success: false,
-                message: "provide required fields email, newPassword, confirmPassword"
-            })
+                message: "Please provide email, newPassword, and confirmPassword"
+            });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return response.status(400).json({
+                error: true,
+                success: false,
+                message: "newPassword and confirmPassword must be the same"
+            });
         }
 
         const user = await UserModel.findOne({ email });
         if (!user) {
-            return response.status(400).json({
-                message: "Email is not available",
-                error: true,
-                success: false
-            })
-        }
-
-
-        if (user?.signUpWithGoogle === false) {
-            const checkPassword = await bcryptjs.compare(oldPassword, user.password);
-            if (!checkPassword) {
-                return response.status(400).json({
-                    message: "your old password is wrong",
-                    error: true,
-                    success: false,
-                })
-            }
-        }
-
-
-        if (newPassword !== confirmPassword) {
-            return response.status(400).json({
-                message: "newPassword and confirmPassword must be same.",
+            return response.status(404).json({
                 error: true,
                 success: false,
-            })
+                message: "User not found with this email"
+            });
         }
 
         const salt = await bcryptjs.genSalt(10);
-        const hashPassword = await bcryptjs.hash(confirmPassword, salt);
+        const hashedPassword = await bcryptjs.hash(newPassword, salt);
 
-        user.password = hashPassword;
+        user.password = hashedPassword;
         user.signUpWithGoogle = false;
         await user.save();
 
         return response.json({
-            message: "Password updated successfully.",
+            message: "Password reset successfully.",
             error: false,
             success: true
-        })
-
+        });
 
     } catch (error) {
         return response.status(500).json({
             message: error.message || error,
             error: true,
             success: false
-        })
+        });
     }
 }
+
 
 
 //refresh token controler

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Search from "../Search";
 import Badge from "@mui/material/Badge";
@@ -13,7 +13,6 @@ import { MyContext } from "../../App";
 import { Button } from "@mui/material";
 import { FaRegUser } from "react-icons/fa";
 import logo from '../../assets/logo.webp'
-
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { IoBagCheckOutline } from "react-icons/io5";
@@ -21,9 +20,8 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import { IoIosLogOut } from "react-icons/io";
 import { fetchDataFromApi } from "../../utils/api";
 import { LuMapPin } from "react-icons/lu";
-import { useEffect } from "react";
 import { HiOutlineMenu } from "react-icons/hi";
-
+import { FaHandshake } from "react-icons/fa"; // Added affiliate icon
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
@@ -36,47 +34,46 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMenuAnchorEl, setMobileMenuAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
+  const mobileMenuOpen = Boolean(mobileMenuAnchorEl);
   const [isOpenCatPanel, setIsOpenCatPanel] = useState(false);
-
   const context = useContext(MyContext);
-
   const history = useNavigate();
+  const location = useLocation();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+  
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-
-  const location = useLocation();
+  const handleMobileMenuClick = (event) => {
+    setMobileMenuAnchorEl(event.currentTarget);
+  };
+  
+  const handleMobileMenuClose = () => {
+    setMobileMenuAnchorEl(null);
+  };
 
   useEffect(() => {
-
     fetchDataFromApi("/api/logo").then((res) => {
       localStorage.setItem('logo', res?.logo[0]?.logo)
-    })
+    });
 
-
-    setTimeout(() => {
-      const token = localStorage.getItem('accessToken');
-
-      if (token !== undefined && token !== null && token !== "") {
-        const url = window.location.href
-        history(location.pathname)
-      } else {
-        history("/login")
-      }
-    }, [1000])
-
+    const token = localStorage.getItem('accessToken');
+    if (token !== undefined && token !== null && token !== "") {
+      history(location.pathname);
+    } else {
+      history("/login");
+    }
   }, [context?.isLogin]);
 
   const logout = () => {
     setAnchorEl(null);
-
+    setMobileMenuAnchorEl(null);
     fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
       if (res?.error === false) {
         context.setIsLogin(false);
@@ -87,238 +84,195 @@ const Header = () => {
         context?.setMyListData([]);
         history("/");
       }
-
-
-    })
-
+    });
   }
 
   return (
     <>
-      <header className="bg-white fixed lg:sticky left-0 w-full top-0 lg:-top-[47px] z-[101]">
-        <div className="top-strip hidden lg:block py-2 border-t-[1px] border-gray-250  border-b-[1px]">
-          <div className="container">
+      <header className="bg-white fixed top-0 left-0 w-full z-[1000] shadow-sm">
+        {/* Top Strip - Desktop Only */}
+        <div className="top-strip hidden lg:block py-2 border-t border-b border-gray-200 bg-gray-50">
+          <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
-              <div className="col1 w-[50%] hidden lg:block">
-                <p className="text-[12px] font-[500] mt-0 mb-0">
+              <div className="w-full md:w-1/2">
+                <p className="text-xs md:text-sm font-medium text-center md:text-left">
                   Get up to 50% off new season styles, limited time only
                 </p>
               </div>
 
-              <div className=" col2 flex items-center justify-between w-full lg:w-[50%] lg:justify-end">
-                <ul className="flex items-center gap-3 w-full justify-between lg:w-[200px]">
-                  <li className="list-none">
-                    <Link
-                      to="/help-center"
-                      className="text-[11px] lg:text-[13px] link font-[500] transition"
-                    >
-                      Help Center{" "}
-                    </Link>
-                  </li>
-                  <li className="list-none">
-                    <Link
-                      to="/order-tracking"
-                      className="text-[11px] lg:text-[13px] link font-[500] transition"
-                    >
-                      Order Tracking
-                    </Link>
-                  </li>
-                </ul>
+              <div className="hidden md:flex items-center justify-end space-x-4 w-full md:w-1/2">
+                <Link to="/help-center" className="text-xs md:text-sm font-medium hover:text-primary transition">
+                  Help Center
+                </Link>
+                <Link to="/order-tracking" className="text-xs md:text-sm font-medium hover:text-primary transition">
+                  Order Tracking
+                </Link>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="header py-2 lg:py-4 border-b-[1px] border-gray-250 bg-[#f6e8d1]">
-          <div className="container flex items-center justify-between">
-            {
-              context?.windowWidth < 992 &&
-              <Button className="!w-[35px] !min-w-[35px] !h-[35px] !rounded-full !text-gray-800" onClick={() => setIsOpenCatPanel(true)}><HiOutlineMenu size={22} /></Button>
-            }
+        {/* Main Header */}
+        <div className="header py-2 lg:py-3 border-b border-gray-200 bg-[#f6e8d1]">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between">
+              {/* Mobile Menu Button */}
+              <div className="lg:hidden flex items-center space-x-2">
+                <Button 
+                  className="!min-w-[40px] !h-[40px] !p-0 !rounded-full !text-gray-800"
+                  onClick={() => setIsOpenCatPanel(true)}
+                >
+                  <HiOutlineMenu size={22} />
+                </Button>
+                
+                {/* Mobile Affiliate Button (Icon only) */}
+                <Tooltip title="Affiliate Program">
+                  <IconButton 
+                    component={Link} 
+                    to="/affiliate-program"
+                    className="!text-gray-800"
+                  >
+                    <FaHandshake size={20} />
+                  </IconButton>
+                </Tooltip>
+              </div>
 
-            <div className="col1 w-[40%] lg:w-[25%]">
-              <Link to={"/"}>
-                <img src={logo} className="max-w-[160px] lg:max-w-[60px]" />
-              </Link>
-            </div>
+              {/* Logo */}
+              <div className="flex-1 lg:flex-none lg:w-1/4 text-center lg:text-left">
+                <Link to="/">
+                  <img 
+                    src={logo} 
+                    alt="Logo" 
+                    className="h-10 lg:h-12 mx-auto lg:mx-0 object-contain" 
+                  />
+                </Link>
+              </div>
 
-            <div className={`col2 fixed top-0 left-0 w-full h-full lg:w-[40%] lg:static p-2 lg:p-0 bg-[#f6e8d1] z-50 ${context?.windowWidth > 992 && '!block'} ${context?.openSearchPanel === true ? 'block' : 'hidden'}`}>
-              <Search />
-            </div>
+              {/* Search - Hidden on mobile unless openSearchPanel is true */}
+              <div className={`${context?.openSearchPanel ? 'block absolute top-16 left-0 w-full px-4 bg-[#f6e8d1] z-50' : 'hidden'} lg:block lg:static lg:w-2/5 lg:px-0 lg:z-auto`}>
+                <Search />
+              </div>
 
-            <div className="col3 w-[10%] lg:w-[30%] flex items-center pl-7 ">
-              <ul className="flex items-center justify-end gap-0 lg:gap-3 w-full">
-                {context.isLogin === false && context?.windowWidth > 992 ? (
-                  <li className="list-none">
-                    <Link
-                      to="/login"
-                      className="link transition text-[15px] font-[500]"
-                    >
+              {/* User Actions */}
+              <div className="flex items-center justify-end space-x-2 lg:space-x-4 lg:w-1/4">
+                {/* Desktop Affiliate Button */}
+                <div className="hidden lg:block">
+                  <Button
+                    variant="outlined"
+                    component={Link}
+                    to="/affiliate-program"
+                    startIcon={<FaHandshake />}
+                    className="!normal-case !text-sm !font-medium !border-gray-300 !text-gray-700 hover:!border-primary hover:!text-primary"
+                  >
+                    Affiliate
+                  </Button>
+                </div>
+
+                {context.isLogin === false ? (
+                  <div className="hidden lg:flex items-center space-x-2">
+                    <Link to="/login" className="text-sm font-medium hover:text-primary">
                       Login
-                    </Link>{" "}
-                    | &nbsp;
-                    <Link
-                      to="/register"
-                      className="link  transition text-[15px]  font-[500]"
-                    >
+                    </Link>
+                    <span>|</span>
+                    <Link to="/register" className="text-sm font-medium hover:text-primary">
                       Register
                     </Link>
-                  </li>
+                  </div>
                 ) : (
                   <>
-                    {
-                      context?.windowWidth > 992 &&
-                      <li>
-                        <Button
-                          className="!text-[#000] myAccountWrap flex items-center gap-3 cursor-pointer"
-                          onClick={handleClick}
-                        >
-                          <Button className="!w-[40px] !h-[40px] !min-w-[40px] !rounded-full !bg-gray-200">
-                            <FaRegUser className="text-[17px] text-[rgba(0,0,0,0.7)]" />
-                          </Button>
+                    {/* User Account - Desktop */}
+                    <div className="hidden lg:block">
+                      <Button
+                        className="!text-black !flex !items-center !gap-2 !p-1"
+                        onClick={handleClick}
+                      >
+                        <div className="!w-9 !h-9 !min-w-[36px] !rounded-full !bg-gray-200 !flex !items-center !justify-center">
+                          <FaRegUser className="text-base" />
+                        </div>
+                        <div className="text-left hidden lg:block">
+                          <p className="text-sm font-medium capitalize">
+                            {context?.userData?.name}
+                          </p>
+                        </div>
+                      </Button>
 
-                          {
-                            context?.windowWidth > 992 &&
-                            <div className="info flex flex-col">
-                              <h4 className="leading-3 text-[14px] text-[rgba(0,0,0,0.6)] font-[500] mb-0 capitalize text-left justify-start">
-                                {context?.userData?.name}
-                              </h4>
-                          
-                            </div>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        PaperProps={{
+                          elevation: 3,
+                          sx: {
+                            mt: 1.5,
+                            minWidth: 200,
+                            '& .MuiMenuItem-root': {
+                              fontSize: '0.875rem',
+                              gap: '0.75rem'
+                            }
                           }
+                        }}
+                        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                      >
+                        <MenuItem onClick={handleClose} component={Link} to="/my-account">
+                          <FaRegUser /> My Account
+                        </MenuItem>
+                        <MenuItem onClick={handleClose} component={Link} to="/address">
+                          <LuMapPin /> Address
+                        </MenuItem>
+                        <MenuItem onClick={handleClose} component={Link} to="/my-orders">
+                          <IoBagCheckOutline /> Orders
+                        </MenuItem>
+                        <MenuItem onClick={handleClose} component={Link} to="/my-list">
+                          <IoMdHeartEmpty /> My List
+                        </MenuItem>
+                        <MenuItem onClick={logout}>
+                          <IoIosLogOut /> Logout
+                        </MenuItem>
+                      </Menu>
+                    </div>
 
-                        </Button>
-
-                        <Menu
-                          anchorEl={anchorEl}
-                          id="account-menu"
-                          open={open}
-                          onClose={handleClose}
-                          onClick={handleClose}
-                          slotProps={{
-                            paper: {
-                              elevation: 0,
-                              sx: {
-                                overflow: "visible",
-                                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                                mt: 1.5,
-                                "& .MuiAvatar-root": {
-                                  width: 32,
-                                  height: 32,
-                                  ml: -0.5,
-                                  mr: 1,
-                                },
-                                "&::before": {
-                                  content: '""',
-                                  display: "block",
-                                  position: "absolute",
-                                  top: 0,
-                                  right: 14,
-                                  width: 10,
-                                  height: 10,
-                                  bgcolor: "background.paper",
-                                  transform: "translateY(-50%) rotate(45deg)",
-                                  zIndex: 0,
-                                },
-                              },
-                            },
-                          }}
-                          transformOrigin={{ horizontal: "right", vertical: "top" }}
-                          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                        >
-                          <Link to="/my-account" className="w-full block">
-                            <MenuItem
-                              onClick={handleClose}
-                              className="flex gap-2 ! !py-2"
-                            >
-                              <FaRegUser className="text-[18px]" />{" "}
-                              <span className="text-[14px]">My Account</span>
-                            </MenuItem>
-                          </Link>
-                          <Link to="/address" className="w-full block">
-                            <MenuItem
-                              onClick={handleClose}
-                              className="flex gap-2 ! !py-2"
-                            >
-                              <LuMapPin className="text-[18px]" />{" "}
-                              <span className="text-[14px]">Address</span>
-                            </MenuItem>
-                          </Link>
-                          <Link to="/my-orders" className="w-full block">
-                            <MenuItem
-                              onClick={handleClose}
-                              className="flex gap-2 ! !py-2"
-                            >
-                              <IoBagCheckOutline className="text-[18px]" />{" "}
-                              <span className="text-[14px]">Orders</span>
-                            </MenuItem>
-                          </Link>
-                          <Link to="/my-list" className="w-full block">
-                            <MenuItem
-                              onClick={handleClose}
-                              className="flex gap-2 ! !py-2"
-                            >
-                              <IoMdHeartEmpty className="text-[18px]" />{" "}
-                              <span className="text-[14px]">My List</span>
-                            </MenuItem>
-                          </Link>
-
-                          <MenuItem
-                            onClick={logout}
-                            className="flex gap-2 ! !py-2"
+                    {/* Wishlist - Desktop */}
+                    <div className="hidden lg:block">
+                      <Tooltip title="Wishlist">
+                        <IconButton component={Link} to="/my-list">
+                          <StyledBadge 
+                            badgeContent={context?.myListData?.length || 0} 
+                            color="secondary"
                           >
-                            <IoIosLogOut className="text-[18px]" />{" "}
-                            <span className="text-[14px]">Logout</span>
-                          </MenuItem>
-                        </Menu>
-                      </li>
-                    }
-
-                  </>
-                )}
-
-
-                {
-                  context?.windowWidth > 992 &&
-                  <li>
-                    <Tooltip title="Wishlist">
-                      <Link to="/my-list">
-                        <IconButton aria-label="cart">
-                          <StyledBadge badgeContent={context?.myListData?.length !== 0 ? context?.myListData?.length : 0} color="secondary">
                             <FaRegHeart />
                           </StyledBadge>
                         </IconButton>
-                      </Link>
-                    </Tooltip>
-                  </li>
+                      </Tooltip>
+                    </div>
+                  </>
+                )}
 
-                }
-
-
-                <li>
-                  <Tooltip title="Cart">
-                    <IconButton
-                      aria-label="cart"
-                      onClick={() => context.setOpenCartPanel(true)}
+                {/* Cart - Always visible */}
+                <Tooltip title="Cart">
+                  <IconButton onClick={() => context.setOpenCartPanel(true)}>
+                    <StyledBadge 
+                      badgeContent={context?.cartData?.length || 0} 
+                      color="secondary"
                     >
-
-                      <StyledBadge badgeContent={context?.cartData?.length !== 0 ? context?.cartData?.length : 0} color="secondary">
-                        <MdOutlineShoppingCart />
-                      </StyledBadge>
-                    </IconButton>
-                  </Tooltip>
-                </li>
-              </ul>
+                      <MdOutlineShoppingCart />
+                    </StyledBadge>
+                  </IconButton>
+                </Tooltip>
+              </div>
             </div>
           </div>
         </div>
 
-        <Navigation isOpenCatPanel={isOpenCatPanel} setIsOpenCatPanel={setIsOpenCatPanel} />
+        {/* Navigation - Desktop */}
+        <Navigation 
+          isOpenCatPanel={isOpenCatPanel} 
+          setIsOpenCatPanel={setIsOpenCatPanel} 
+        />
       </header>
 
-
-      <div className="afterHeader mt-[115px] lg:mt-0"></div>
-
+      {/* Spacer to push content down */}
+      <div className="h-[70px] "></div>
     </>
   );
 };
