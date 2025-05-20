@@ -17,7 +17,7 @@ const AffiliatePayment = () => {
 
       try {
         const { data } = await axios.post('/api/affiliate/create-order', {
-          amount: 49,
+          amount: 100,
           currency: 'INR',
           notes: affiliateData
         });
@@ -28,7 +28,7 @@ const AffiliatePayment = () => {
           key: import.meta.env.VITE_APP_RAZORPAY_KEY_ID,
           amount: amount.toString(),
           currency,
-          name: 'Your Company',
+          name: 'Spark n stitch',
           description: 'Affiliate Program Payment',
           order_id: orderId,
           handler: async function (response) {
