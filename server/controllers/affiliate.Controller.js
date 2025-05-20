@@ -10,7 +10,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// ✅ Create Razorpay Order
+// ✅ Create Order
 const createOrder = async (req, res) => {
   try {
     const { amount, currency, notes } = req.body;
@@ -20,7 +20,7 @@ const createOrder = async (req, res) => {
     }
 
     const options = {
-      amount: amount * 100, // Convert rupees to paise
+      amount: amount * 100, // rupees to paise
       currency,
       receipt: `affiliate_${Date.now()}`,
       notes,
@@ -30,12 +30,12 @@ const createOrder = async (req, res) => {
     const order = await razorpay.orders.create(options);
     res.status(200).json({ success: true, order });
   } catch (error) {
-    console.error('❌ Error creating order:', error);
+    console.error('Order Error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-// ✅ Verify Payment and Save Affiliate
+// ✅ Verify Payment
 const verifyPayment = async (req, res) => {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
@@ -44,7 +44,6 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing payment details' });
     }
 
-    // 1️⃣ Verify Razorpay Signature
     const generatedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -54,18 +53,15 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Invalid signature' });
     }
 
-    // 2️⃣ Get the actual payment details
     const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
 
-    // 3️⃣ Check if payment is really successful
     if (paymentDetails.status !== 'captured') {
       return res.status(400).json({
         success: false,
-        error: `Payment not successful. Current status: ${paymentDetails.status}`,
+        error: `Payment not captured: ${paymentDetails.status}`
       });
     }
 
-    // 4️⃣ Save affiliate details
     const order = await razorpay.orders.fetch(razorpay_order_id);
     const notes = order.notes || {};
 
@@ -82,14 +78,14 @@ const verifyPayment = async (req, res) => {
 
     await affiliate.save();
 
-    res.status(200).json({ success: true, message: 'Payment verified and affiliate saved' });
+    res.status(200).json({ success: true, message: 'Payment successful and affiliate saved' });
   } catch (error) {
-    console.error('❌ Error verifying payment:', error);
+    console.error('Verification Error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
-
+// ✅ Default export for router
 export default {
   createOrder,
   verifyPayment

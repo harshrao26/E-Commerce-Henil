@@ -41,14 +41,7 @@ const MobileNav = () => {
                     </Button>
                 </NavLink>
 
-                <Button 
-                    className="flex-col !w-full !min-w-0 !p-0 !capitalize !text-gray-700"
-                    onClick={() => context?.setOpenSearchPanel(true)}
-                >
-                    <IoSearch size={18} />
-                    <span className='text-[10px] sm:text-[12px]'>Search</span>
-                </Button>
-
+                
                 {context?.isFilterBtnShow && (
                     <Button 
                         className="flex-col !w-full !min-w-0 !p-0 !aspect-square !max-w-[40px] !bg-primary !rounded-full"

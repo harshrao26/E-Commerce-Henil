@@ -102,10 +102,10 @@ const Header = () => {
 
               <div className="hidden md:flex items-center justify-end space-x-4 w-full md:w-1/2">
                 <Link to="/help-center" className="text-xs md:text-sm font-medium hover:text-primary transition">
-                  Help Center
+                  {/* Help Center */}
                 </Link>
                 <Link to="/order-tracking" className="text-xs md:text-sm font-medium hover:text-primary transition">
-                  Order Tracking
+                  {/* Order Tracking */}
                 </Link>
               </div>
             </div>
@@ -148,10 +148,7 @@ const Header = () => {
                 </Link>
               </div>
 
-              {/* Search - Hidden on mobile unless openSearchPanel is true */}
-              <div className={`${context?.openSearchPanel ? 'block absolute top-16 left-0 w-full px-4 bg-[#f6e8d1] z-50' : 'hidden'} lg:block lg:static lg:w-2/5 lg:px-0 lg:z-auto`}>
-                <Search />
-              </div>
+             
 
               {/* User Actions */}
               <div className="flex items-center justify-end space-x-2 lg:space-x-4 lg:w-1/4">

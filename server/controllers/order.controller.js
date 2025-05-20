@@ -6,129 +6,154 @@ import OrderConfirmationEmail from "../utils/orderEmailTemplate.js";
 import sendEmailFun from "../config/sendEmail.js";
 
 export const createOrderController = async (request, response) => {
-    try {
+  try {
+    const { userId, products, paymentId, payment_status, delivery_address, totalAmt, date } = request.body;
 
-        let order = new OrderModel({
-            userId: request.body.userId,
-            products: request.body.products,
-            paymentId: request.body.paymentId,
-            payment_status: request.body.payment_status,
-            delivery_address: request.body.delivery_address,
-            totalAmt: request.body.totalAmt,
-            date: request.body.date
-        });
-
-        if (!order) {
-            response.status(500).json({
-                error: true,
-                success: false
-            })
-        }
-
-        order = await order.save();
-
-        for (let i = 0; i < request.body.products.length; i++) {
-
-            const product = await ProductModel.findOne({ _id: request.body.products[i].productId })
-            console.log(product)
-
-            await ProductModel.findByIdAndUpdate(
-                request.body.products[i].productId,
-                {
-                    countInStock: parseInt(request.body.products[i].countInStock - request.body.products[i].quantity),
-                    sale: parseInt(product?.sale + request.body.products[i].quantity)
-                },
-                { new: true }
-            );
-        }
-
-        const user = await UserModel.findOne({ _id: request.body.userId })
-
-        const recipients = [];
-        recipients.push(user?.email);
-
-        // Send verification email
-        await sendEmailFun({
-            sendTo: recipients,
-            subject: "Order Confirmation",
-            text: "",
-            html: OrderConfirmationEmail(user?.name, order)
-        })
-
-
-        return response.status(200).json({
-            error: false,
-            success: true,
-            message: "Order Placed",
-            order: order
-        });
-
-
-    } catch (error) {
-        return response.status(500).json({
-            message: error.message || error,
-            error: true,
-            success: false
-        })
+    if (!userId || !products || products.length === 0) {
+      return response.status(400).json({
+        error: true,
+        success: false,
+        message: "Invalid order data"
+      });
     }
-}
+
+    // Check if user exists
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return response.status(404).json({
+        error: true,
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Create new order instance
+    let order = new OrderModel({
+      userId,
+      products,
+      paymentId,
+      payment_status,
+      delivery_address,
+      totalAmt,
+      date
+    });
+
+    // Save order to DB
+    order = await order.save();
+
+    // Update product stock and sales
+    for (let i = 0; i < products.length; i++) {
+      const { productId, quantity } = products[i];
+
+      const product = await ProductModel.findById(productId);
+      if (!product) {
+        // Optionally, handle product not found
+        return response.status(404).json({
+          error: true,
+          success: false,
+          message: `Product with ID ${productId} not found`
+        });
+      }
+
+      if (product.countInStock < quantity) {
+        return response.status(400).json({
+          error: true,
+          success: false,
+          message: `Insufficient stock for product ${product.name}`
+        });
+      }
+
+      product.countInStock -= quantity;
+      product.sale = (product.sale || 0) + quantity;
+
+      await product.save();
+    }
+
+    // Send confirmation email
+    await sendEmailFun({
+      sendTo: [user.email],
+      subject: "Order Confirmation",
+      text: "",
+      html: OrderConfirmationEmail(user.name, order),
+    });
+
+    return response.status(200).json({
+      error: false,
+      success: true,
+      message: "Order Placed",
+      order,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+};
 
 
+
+// Get all orders (for admin)
 export async function getOrderDetailsController(request, response) {
     try {
-        const userId = request.userId // order id
+        const { page = 1, limit = 10 } = request.query;
 
-        const { page, limit } = request.query;
+        const orderlist = await OrderModel.find()
+            .sort({ createdAt: -1 })
+            .populate('delivery_address userId products.productId') // Added product population
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit));
 
-        const orderlist = await OrderModel.find().sort({ createdAt: -1 }).populate('delivery_address userId').skip((page - 1) * limit).limit(parseInt(limit));
-
-        const total = await OrderModel.countDocuments(orderlist);
+        const total = await OrderModel.countDocuments();
 
         return response.json({
-            message: "order list",
+            message: "Order list retrieved successfully",
             data: orderlist,
             error: false,
             success: true,
             total: total,
-            page: parseInt(page),
+            currentPage: parseInt(page),
             totalPages: Math.ceil(total / limit)
-        })
+        });
     } catch (error) {
         return response.status(500).json({
-            message: error.message || error,
+            message: "Server error while fetching orders: " + error.message,
             error: true,
             success: false
-        })
+        });
     }
 }
 
+// Get user-specific orders
 export async function getUserOrderDetailsController(request, response) {
     try {
-        const userId = request.userId // order id
+        const userId = request.userId;
+        const { page = 1, limit = 10 } = request.query;
 
-        const { page, limit } = request.query;
+        const orderlist = await OrderModel.find({ userId: userId })
+            .sort({ createdAt: -1 })
+            .populate('delivery_address userId products.productId') // Added product population
+            .skip((page - 1) * limit)
+            .limit(parseInt(limit));
 
-        const orderlist = await OrderModel.find({ userId: userId }).sort({ createdAt: -1 }).populate('delivery_address userId').skip((page - 1) * limit).limit(parseInt(limit));
-
-        const orderTotal = await OrderModel.find({ userId: userId }).sort({ createdAt: -1 }).populate('delivery_address userId');
-
-        const total = await orderTotal?.length;
+        const total = await OrderModel.countDocuments({ userId: userId });
 
         return response.json({
-            message: "order list",
+            message: "User orders retrieved successfully",
             data: orderlist,
             error: false,
             success: true,
             total: total,
-            page: parseInt(page),
+            currentPage: parseInt(page),
             totalPages: Math.ceil(total / limit)
-        })
+        });
     } catch (error) {
         return response.status(500).json({
-            message: error.message || error,
+            message: "Server error while fetching user orders: " + error.message,
             error: true,
             success: false
-        })
+        });
     }
 }
 

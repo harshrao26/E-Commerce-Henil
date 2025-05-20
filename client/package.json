@@ -26,6 +26,7 @@
     "react-inner-image-zoom": "^3.0.2",
     "react-international-phone": "^4.4.0",
     "react-lazy-load-image-component": "^1.6.3",
+    "react-phone-number-input": "^3.4.12",
     "react-range-slider-input": "^3.0.7",
     "react-router-dom": "^7.6.0",
     "styled-components": "^6.1.13",

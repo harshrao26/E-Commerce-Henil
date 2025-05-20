@@ -84,7 +84,7 @@ const Footer = () => {
                 className="link text-[13px]"
                 to="mailto:someone@example.com"
               >
-                sales@yourcompany.com
+              business.sparknstitch@gmail.com
               </Link>
 
               <span className="text-[22px] font-[600] block w-full mt-3 mb-5 text-zinc-500">
@@ -176,33 +176,7 @@ const Footer = () => {
                 </ul>
               </div>
             </div>
-
-            <div className="part2  w-full lg:w-[35%] flex pl-0 lg:pl-8 flex-col pr-8 mt-5 lg:mt-0">
-              <h2 className="text-[18px] font-[600] mb-2 lg:mb-4">
-                Subscribe to newsletter
-              </h2>
-              <p className="text-[13px]">
-                Subscribe to our latest newsletter to get news about special
-                discounts.
-              </p>
-
-              <form className="mt-5">
-                <input
-                  type="text"
-                  className="w-full h-[45px] border outline-none pl-4 pr-4 rounded-sm mb-4 focus:border-[rgba(0,0,0,0.3)]"
-                  placeholder="Your Email Address"
-                />
-
-                <Button className="btn-org">SUBSCRIBE</Button>
-
-                <FormControlLabel
-                  className="mt-3 lg:mt-0 block w-full"
-                  control={<Checkbox />}
-                  label=" I agree to the terms and conditions and the privacy policy"
-                />
-              </form>
-            </div>
-          </div>
+</div>
         </div>
       </footer>
 
@@ -211,7 +185,7 @@ const Footer = () => {
           <ul className="flex items-center gap-2">
             <li className="list-none">
               <Link
-                to="/"
+                to="https://www.facebook.com/share/1Em5mQM9Pz/?mibextid=wwXIfr"
                 target="_blank"
                 className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.1)] flex items-center justify-center group hover:bg-zinc-text-zinc-500 transition-all"
               >
@@ -219,29 +193,9 @@ const Footer = () => {
               </Link>
             </li>
 
-            <li className="list-none">
+         <li className="list-none">
               <Link
-                to="/"
-                target="_blank"
-                className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.1)] flex items-center justify-center group hover:bg-zinc-text-zinc-500 transition-all"
-              >
-                <AiOutlineYoutube className="text-[21px] group-hover:text-white" />
-              </Link>
-            </li>
-
-            <li className="list-none">
-              <Link
-                to="/"
-                target="_blank"
-                className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.1)] flex items-center justify-center group hover:bg-zinc-text-zinc-500 transition-all"
-              >
-                <FaPinterestP className="text-[17px] group-hover:text-white" />
-              </Link>
-            </li>
-
-            <li className="list-none">
-              <Link
-                to="/"
+                to="https://www.instagram.com/sparknstitch?igsh=MTRkeTB2YmRwdW9hYQ=="
                 target="_blank"
                 className="w-[35px] h-[35px] rounded-full border border-[rgba(0,0,0,0.1)] flex items-center justify-center group hover:bg-zinc-text-zinc-500 transition-all"
               >

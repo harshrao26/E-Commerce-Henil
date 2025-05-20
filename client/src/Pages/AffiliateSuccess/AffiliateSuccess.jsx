@@ -4,18 +4,21 @@ import { Link } from 'react-router-dom';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const AffiliateSuccess = () => {
-  const whatsappGroupLink = "https://chat.whatsapp.com/YOUR_GROUP_LINK";
+  const whatsappGroupLink = "https://chat.whatsapp.com/EGXJWqqAp7s3ODEVLNMYzB";
+  const bgColor = '#f6e8d1';
+  const btnColor = '#d3a762'; // Complementary shade
+  const btnHover = '#c99c56'; // Slightly darker for hover
 
   return (
     <Container maxWidth="sm" sx={{ mt: 8, mb: 4 }}>
       <Box sx={{ 
-        bgcolor: 'background.paper', 
+        backgroundColor: bgColor, 
         p: 4, 
         borderRadius: 2, 
         boxShadow: 1,
         textAlign: 'center'
       }}>
-        <Typography variant="h4" gutterBottom color="success.main">
+        <Typography variant="h4" gutterBottom sx={{ color: btnColor }}>
           Payment Successful!
         </Typography>
         <Typography variant="body1" paragraph>
@@ -25,7 +28,7 @@ const AffiliateSuccess = () => {
           You will receive an email with all the details shortly.
         </Typography>
         
-        <Box sx={{ mt: 4, p: 3, bgcolor: 'grey.100', borderRadius: 2 }}>
+        <Box sx={{ mt: 4, p: 3, bgcolor: '#fff', borderRadius: 2 }}>
           <Typography variant="h6" gutterBottom>
             Join our WhatsApp Group
           </Typography>
@@ -34,12 +37,17 @@ const AffiliateSuccess = () => {
           </Typography>
           <Button
             variant="contained"
-            color="success"
             startIcon={<FaWhatsapp />}
             href={whatsappGroupLink}
             target="_blank"
             rel="noopener noreferrer"
-            sx={{ mt: 2 }}
+            sx={{
+              mt: 2,
+              backgroundColor: btnColor,
+              '&:hover': {
+                backgroundColor: btnHover,
+              }
+            }}
           >
             Join WhatsApp Group
           </Button>
@@ -49,7 +57,16 @@ const AffiliateSuccess = () => {
           variant="outlined"
           component={Link}
           to="/"
-          sx={{ mt: 4 }}
+          sx={{
+            mt: 4,
+            color: btnColor,
+            borderColor: btnColor,
+            '&:hover': {
+              backgroundColor: btnColor,
+              color: '#fff',
+              borderColor: btnHover,
+            }
+          }}
         >
           Back to Home
         </Button>
